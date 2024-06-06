@@ -1,0 +1,13 @@
+{
+  "INPUT_PLACEHOLDER": "London",
+  "NAME_CITY": "Enter the city name",
+  "ERROR_MESSAGE": "There was an error getting the data",
+  "SEARCH_BUTTON": "Search",
+  "FEELS_LIKE": "Feels like",
+  "SEO": {
+    "TITLE": {
+      "HOME": "Weather App | Lucia"
+    },
+    "DESCRIPTION": "The best app to check the weather in your city."
+  }
+}

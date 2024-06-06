@@ -1,0 +1,14 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Weathere from "../weather.jsx";
+import { getI18N } from "../../i18n/index.js";
+
+const { currentLocale } = Astro;
+const i18n = getI18N({ currentLocale });
+---
+
+<Layout title={i18n.SEO.TITLE.HOME} description={i18n.SEO.DESCRIPTION}>
+  <div class="flex mt-8 items-center justify-center gap-8">
+    <Weathere currentLocale={currentLocale} client:only="react" />
+  </div>
+</Layout>

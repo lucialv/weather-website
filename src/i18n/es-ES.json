@@ -1,0 +1,13 @@
+{
+  "INPUT_PLACEHOLDER": "Madrid",
+  "NAME_CITY": "Ingresa el nombre de la ciudad",
+  "ERROR_MESSAGE": "Ha habido un error al obtener los datos",
+  "SEARCH_BUTTON": "Buscar",
+  "FEELS_LIKE": "Sensación térmica de",
+  "SEO": {
+    "TITLE": {
+      "HOME": "El tiempo App | Lucia"
+    },
+    "DESCRIPTION": "La mejor aplicación para ver el tiempo en tu ciudad."
+  }
+}

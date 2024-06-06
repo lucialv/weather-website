@@ -1,0 +1,73 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+import { getI18N } from "../i18n/index.js";
+import LanguageSelector from "../components/LanguageSelector.astro";
+const { currentLocale } = Astro;
+
+const i18n = getI18N({ currentLocale });
+---
+
+<!doctype html>
+<html data-theme="light" lang={currentLocale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={i18n.SEO.DESCRIPTION} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" href="/icono.png" />
+    <title>{i18n.SEO.TITLE.HOME}</title>
+
+    <!-- Twitter Meta Tags -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:site" content="@luciacatgirl" />
+    <meta property="twitter:title" content={i18n.SEO.TITLE.HOME} />
+    <meta property="twitter:description" content={i18n.SEO.DESCRIPTION} />
+    <meta property="twitter:image" content="/seoimage.png" />
+    <meta property="twitter:image:width" content="1200" />
+    <meta property="twitter:image:height" content="628" />
+
+    <!-- Open Graph (OG) Meta Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={i18n.SEO.DESCRIPTION} />
+    <meta property="og:image" content="/seoimage.png" />
+    <meta property="og:url" content="https://weather.lucia-dev.com" />
+    <meta property="og:site_name" content={i18n.SEO.TITLE.HOME} />
+
+    <!-- Theme Meta Tags -->
+    <meta name="theme-color" content="#c026d3" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="msapplication-navbutton-color" content="#c026d3" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content={i18n.SEO.TITLE.HOME} />
+  </head>
+  <body>
+    <div class="navbar bg-base-100">
+      <div class="flex-1">
+        <a
+          href={currentLocale === "en" ? "/en" : "/"}
+          class="text-xl hover:scale-110"
+        >
+          <img src="/Logo.png" alt="logo" class="h-12 p-1" />
+        </a>
+      </div>
+      <LanguageSelector />
+    </div>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+  html {
+    font-family: system-ui, sans-serif;
+    background-size: 224px;
+    background-color: #292928;
+  }
+
+  [data-theme="light"] .input {
+  }
+</style>
