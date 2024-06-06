@@ -157,6 +157,7 @@ const Weathere = ({ currentLocale }) => {
               className={`input input-bordered input-${fallo ? "error" : "accent"} w-full max-w-xs`}
               type="text"
               name="city"
+              autocomplete="off"
               value={cityName}
               onChange={handleChange}
               placeholder={i18n.INPUT_PLACEHOLDER}
