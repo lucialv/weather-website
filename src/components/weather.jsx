@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getI18N } from "../i18n/index.ts";
 
 const Weathere = ({ currentLocale }) => {
@@ -7,23 +7,45 @@ const Weathere = ({ currentLocale }) => {
   const [forecast, setForecast] = useState(null);
   const [fallo, setFallo] = useState(false);
   const [rainChance, setRainChance] = useState(null);
-  const [suggestions, setSuggestions] = useState([]); // Estado para almacenar sugerencias
+  const [suggestions, setSuggestions] = useState([]);
   const i18n = getI18N({ currentLocale });
+
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+
+    if (!scrollContainer) return;
+
+    const handleWheel = (evt) => {
+      evt.preventDefault();
+
+      if (evt.deltaY >= -15 && evt.deltaY <= 15) {
+        scrollContainer.scrollLeft += evt.deltaY * 1;
+      } else {
+        scrollContainer.scrollLeft += evt.deltaY * 1;
+      }
+    };
+
+    scrollContainer.addEventListener("wheel", handleWheel);
+
+    return () => {
+      scrollContainer.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   const handleChange = async (event) => {
     const input = event.target.value;
     setCityName(input);
-    setDatos(null); // Borra los datos
-    setForecast(null); // Borra los datos de pronóstico
+    setDatos(null);
+    setForecast(null);
     try {
-      const response = await fetch(
-        `/api/weather/search/${input}`, // Cambiar a tu endpoint de búsqueda de ciudades
-      );
+      const response = await fetch(`/api/weather/search/${input}`);
       if (response.ok) {
         const data = await response.json();
-        setSuggestions(data); // Actualizar el estado de sugerencias con la respuesta de la API
+        setSuggestions(data);
       } else {
-        setSuggestions([]); // Limpiar las sugerencias si no hay respuesta válida
+        setSuggestions([]);
       }
     } catch (error) {
       console.error("Error al obtener sugerencias de ciudades:", error);
@@ -51,10 +73,8 @@ const Weathere = ({ currentLocale }) => {
       }
       const dataForecast = await responseForecast.json();
 
-      // Filtrar las predicciones para mostrar solo las posteriores al tiempo actual
       const currentTimeEpoch = dataCurrent.location.localtime_epoch;
       const forecastData = dataForecast.forecast;
-      // Conseguir la probabilidad de lluvia
       const rainChance = forecastData.forecastday[0].day.daily_chance_of_rain;
       setRainChance(rainChance);
       if (
@@ -67,13 +87,11 @@ const Weathere = ({ currentLocale }) => {
         );
 
         if (filteredForecast.length > 5) {
-          // Limitar a solo las próximas 5 horas
           filteredForecast.splice(5);
         }
 
         setForecast({ forecastday: [{ hour: filteredForecast }] });
       } else {
-        // Manejar el caso en el que no hay datos de pronóstico disponibles
         setForecast(null);
       }
 
@@ -81,8 +99,8 @@ const Weathere = ({ currentLocale }) => {
       setFallo(false);
     } catch (error) {
       console.error("Error al obtener datos:", error);
-      setDatos(null); // Borra los datos en caso de fallo
-      setForecast(null); // Borra los datos de pronóstico en caso de fallo
+      setDatos(null);
+      setForecast(null);
       setFallo(true);
     }
   };
@@ -109,10 +127,8 @@ const Weathere = ({ currentLocale }) => {
       }
       const dataForecast = await responseForecast.json();
 
-      // Filtrar las predicciones para mostrar solo las posteriores al tiempo actual
       const currentTimeEpoch = dataCurrent.location.localtime_epoch;
       const forecastData = dataForecast.forecast;
-      // Conseguir la probabilidad de lluvia
       const rainChance = forecastData.forecastday[0].day.daily_chance_of_rain;
       setRainChance(rainChance);
       if (
@@ -125,13 +141,11 @@ const Weathere = ({ currentLocale }) => {
         );
 
         if (filteredForecast.length > 5) {
-          // Limitar a solo las próximas 5 horas
           filteredForecast.splice(5);
         }
 
         setForecast({ forecastday: [{ hour: filteredForecast }] });
       } else {
-        // Manejar el caso en el que no hay datos de pronóstico disponibles
         setForecast(null);
       }
 
@@ -139,8 +153,8 @@ const Weathere = ({ currentLocale }) => {
       setFallo(false);
     } catch (error) {
       console.error("Error al obtener datos:", error);
-      setDatos(null); // Borra los datos en caso de fallo
-      setForecast(null); // Borra los datos de pronóstico en caso de fallo
+      setDatos(null);
+      setForecast(null);
       setFallo(true);
     }
   };
@@ -157,7 +171,7 @@ const Weathere = ({ currentLocale }) => {
               className={`input input-bordered input-${fallo ? "error" : "accent"} w-full max-w-xs`}
               type="text"
               name="city"
-              autocomplete="off"
+              autoComplete="off"
               value={cityName}
               onChange={handleChange}
               placeholder={i18n.INPUT_PLACEHOLDER}
@@ -196,34 +210,25 @@ const Weathere = ({ currentLocale }) => {
             </button>
           </div>
         </form>
-        {
-          // Mostrar sugerencias solo si hay alguna y no hay datos de la ciudad
-          !datos && suggestions.length > 0 ? (
-            <div className="grid grid-flow-col grid-rows-3 lg:grid-rows-1 lg:grid-cols-1 gap-4 mt-4 text-[10px]">
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  className="btn btn-secondary btn-sm btn-outline"
-                  onClick={() => handleSuggestionClick(suggestion)}
-                >
-                  {suggestion.name}
-                </button>
-              ))}
-            </div>
-          ) : null
-        }
+        {!datos && suggestions.length > 0 ? (
+          <div className="grid grid-flow-col grid-rows-3 lg:grid-rows-1 lg:grid-cols-1 gap-4 mt-4 text-[10px]">
+            {suggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                className="btn btn-secondary btn-sm btn-outline"
+                onClick={() => handleSuggestionClick(suggestion)}
+              >
+                {suggestion.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
       <div className="md:scale-105 md:mt-12 lg:scale-125 lg:mt-24 2xl:scale-150 2xl:mt-32">
         {datos ? (
-          <div className="flex-row text-3xl">
-            <h1 className="text-center font-bold mt-8 mb-4">
+          <div className="mt-12 text-center text-xl p-4 rounded-lg max-w-xs mx-auto">
+            <h1 className="font-bold text-[20px]">
               {datos.location.name},{" "}
-              {currentLocale === "en"
-                ? datos.location.region
-                : datos.location.region !== "Catalonia"
-                  ? datos.location.region
-                  : "Cataluña"}
-              ,{" "}
               {currentLocale === "en"
                 ? datos.location.country
                 : datos.location.country !== "Spain"
@@ -252,11 +257,11 @@ const Weathere = ({ currentLocale }) => {
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-4 w-4"
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="#08c"
                   fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M7.502 19.423c2.602 2.105 6.395 2.105 8.996 0c2.602 -2.105 3.262 -5.708 1.566 -8.546l-4.89 -7.26c-.42 -.625 -1.287 -.803 -1.936 -.397a1.376 1.376 0 0 0 -.41 .397l-4.893 7.26c-1.695 2.838 -1.035 6.441 1.567 8.546z" />
@@ -269,10 +274,16 @@ const Weathere = ({ currentLocale }) => {
       </div>
       {forecast ? (
         <div className="md:scale-105 md:mt-12 lg:scale-125 lg:mt-24 2xl:scale-150 2xl:mt-32">
-          <h2 className="text-center font-bold my-8">{i18n.FORECAST_TITLE}</h2>
-          <div className="grid place-content-center text-center gap-4 grid-flow-col">
+          <h2 className="font-bold my-8">{i18n.FORECAST_TITLE}</h2>
+          <div
+            ref={scrollContainerRef}
+            className="bg-blue-300 scroll-container overflow-x-auto no-scrollbar overflow-y-hidden max-w-sm rounded-lg p-4 grid grid-rows-1 text-center gap-4 grid-flow-col"
+          >
             {forecast.forecastday[0].hour.map((hourData, index) => (
-              <div key={index}>
+              <div
+                className="bg-blue-200 px-6 rounded-lg hover:scale-105 py-2 glass-effect"
+                key={index}
+              >
                 <p>{hourData.time.split(" ")[1]}</p>
                 <img
                   src={hourData.condition.icon}
